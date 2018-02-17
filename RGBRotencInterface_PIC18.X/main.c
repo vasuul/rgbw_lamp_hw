@@ -169,7 +169,7 @@ void interrupt isr(void) {
         SPI_buf[SPI_buf_indx] = SSPBUF;
         SSPBUF = SPI_next;
         switch(SPI_buf_indx++) {
-            case 0: SPI_next = fb_pressed; fb_pressed = 0; break;
+            case 0: if(SPI_buf[0] == 0) { SPI_next = fb_pressed; fb_pressed = 0; } else SPI_next = 0x00; break;
             case 1: SPI_next = active_color; break;
             case 2: SPI_next = colors[0]; break;
             case 3: SPI_next = colors[1]; break;
@@ -213,7 +213,7 @@ void main(void) {
     GREEN_PIN = 1; // 1 is off for LEDs (common anode))
     RED_PIN = 1;
     BLUE_PIN = 1;
-    FBUTTON_LED_PIN = 0;
+    FBUTTON_LED_PIN = 1;
 
 #ifdef DEBUG
     // setup the UART
@@ -256,7 +256,7 @@ void main(void) {
                     colors[2] = SPI_buf[4];
                     colors[3] = SPI_buf[5];
                     break;
-                case 2: FBUTTON_LED_PIN = (SPI_buf[1] == 0) ? 0 : 1; break;
+                case 2: FBUTTON_LED_PIN = (SPI_buf[1] == 0) ? 1 : 0; break;
                 case 3: FAN_PIN = (SPI_buf[1] == 0) ? 0 : 1; break;
                 default: break;
             }
